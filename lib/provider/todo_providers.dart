@@ -36,7 +36,6 @@ class TodosViewController {
   TodosViewController(this.read);
 
   void initState() async {
-    print('initesat');
     read(_todos).state = await read(todoRepository).getTodos();
   }
 

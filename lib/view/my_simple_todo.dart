@@ -55,20 +55,6 @@ class MySimpleTodo extends HookWidget {
               IconButton(
                 icon: const Icon(Icons.sort),
                 onPressed: () {
-                  // Navigator.pushReplacement(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //       builder: (context) => Scaffold(
-                  //           floatingActionButton: FloatingActionButton(
-                  //             onPressed: () {
-                  //               Navigator.push(
-                  //                   context,
-                  //                   MaterialPageRoute(
-                  //                       builder: (context) => MySimpleTodo()));
-                  //             },
-                  //           ),
-                  //           body: Container()),
-                  //     ));
                   context.read(todosViewController).changeSortOrder();
                 },
               )

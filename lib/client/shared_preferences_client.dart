@@ -8,7 +8,6 @@ final sharedPreferencesClient = Provider((ref) => SharedPreferencesClient());
 class SharedPreferencesClient {
   Future<List<Map<String, dynamic>>> getJsonList(String key) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    // prefs.clear();
     return List<Map<String, dynamic>>.from(
         jsonDecode(prefs.getString(key) ?? '[]'));
   }
