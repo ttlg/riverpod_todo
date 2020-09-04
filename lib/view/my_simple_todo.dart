@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-final _currentTodoProvider = ScopedProvider<Todo>(null);
+final _currentTodo = ScopedProvider<Todo>(null);
 
 class TodoTile extends HookWidget {
   const TodoTile();
 
   @override
   Widget build(BuildContext context) {
-    final todo = useProvider(_currentTodoProvider);
+    final todo = useProvider(_currentTodo);
     return Card(
       child: ListTile(
         title: Text(todo.content),
@@ -65,7 +65,7 @@ class MySimpleTodo extends HookWidget {
               itemCount: todos.length,
               itemBuilder: (ctx, int idx) => ProviderScope(
                 overrides: [
-                  _currentTodoProvider.overrideWithValue(todos[idx]),
+                  _currentTodo.overrideWithValue(todos[idx]),
                 ],
                 child: const TodoTile(),
               ),

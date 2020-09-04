@@ -16,14 +16,10 @@ final sortedTodos =
   final List<Todo> todos = ref.watch(_todos).state;
   final SortOrder sortOrder = ref.watch(_sortOrder).state;
 
-  if (todos == null) {
-    return null;
-  }
-
   if (sortOrder == SortOrder.ASC) {
-    todos.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    todos?.sort((a, b) => a.timestamp.compareTo(b.timestamp));
   } else {
-    todos.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    todos?.sort((a, b) => b.timestamp.compareTo(a.timestamp));
   }
   return todos;
 });
