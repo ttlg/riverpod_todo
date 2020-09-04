@@ -11,8 +11,7 @@ enum SortOrder {
 final _sortOrder = StateProvider.autoDispose((ref) => SortOrder.ASC);
 final _todos = StateProvider.autoDispose<List<Todo>>((ref) => null);
 
-final sortedTodos =
-    StateProvider.autoDispose<List<Todo>>((ProviderReference ref) {
+final sortedTodos = StateProvider<List<Todo>>((ProviderReference ref) {
   final List<Todo> todos = ref.watch(_todos).state;
   final SortOrder sortOrder = ref.watch(_sortOrder).state;
 
