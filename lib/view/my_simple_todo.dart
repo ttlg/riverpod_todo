@@ -35,7 +35,7 @@ class MySimpleTodo extends HookWidget {
     useEffect(() {
       context.read(todosViewController).initState();
       return context.read(todosViewController).dispose;
-    }, ['never']);
+    }, []);
     final textController = useTextEditingController();
 
     final List<Todo> todos = useProvider(sortedTodos).state;
