@@ -1,6 +1,6 @@
 # Pragmatic Architecture using Riverpod
 
-This repository is created to explain the pragmratic architecture using Riverpod.
+This repository has been created to illustrate a pragmatic architecture using Riverpod.
 
 ## Articles
 - [English Version](https://medium.com/@mxiskw/flutter-pragmatic-architecture-using-riverpod-123ae11a8267)
