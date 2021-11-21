@@ -1,30 +1,34 @@
-import 'package:architect_test/client/shared_preferences_client.dart';
-import 'package:architect_test/entity/todo.dart';
+import 'dart:convert';
+
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:todo_riverpod/entity/todo.dart';
 
 final todoRepository =
     Provider.autoDispose<TodoRepository>((ref) => TodoRepositoryImpl(ref.read));
 
 abstract class TodoRepository {
-  Future<List<Todo>> getTodos();
-  Future<void> saveTodos(List<Todo> todos);
+  Future<List<Todo>> getTodoList();
+  Future<void> saveTodoList(List<Todo> todoList);
 }
 
+const _todoListKey = 'todoListKey';
+
 class TodoRepositoryImpl implements TodoRepository {
-  final Reader read;
-  TodoRepositoryImpl(this.read);
+  final Reader _read;
+  TodoRepositoryImpl(this._read);
 
-  final _todoKey = 'todos';
-  Future<List<Todo>> getTodos() async {
-    final SharedPreferencesClient prefs = read(sharedPreferencesClient);
-    final List<Map<String, dynamic>> todosJsons =
-        await prefs.getJsonList(_todoKey) ?? [];
-
-    return todosJsons.map((json) => Todo.fromJson(json)).toList();
+  Future<List<Todo>> getTodoList() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final List<Map<String, dynamic>> todoListJsonList =
+        List<Map<String, dynamic>>.from(
+            jsonDecode(prefs.getString(_todoListKey) ?? '[]'));
+    return todoListJsonList.map((json) => Todo.fromMap(json)).toList();
   }
 
-  Future<void> saveTodos(List<Todo> todos) async {
-    final SharedPreferencesClient prefs = read(sharedPreferencesClient);
-    await prefs.saveJson(_todoKey, todos.map((todo) => todo.toJson()).toList());
+  Future<void> saveTodoList(List<Todo> todoList) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_todoListKey,
+        jsonEncode(todoList.map((todo) => todo.toMap()).toList()));
   }
 }

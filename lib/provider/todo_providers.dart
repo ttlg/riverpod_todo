@@ -1,70 +1,74 @@
-import 'package:architect_test/entity/todo.dart';
-import 'package:architect_test/repository/todo_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:todo_riverpod/entity/todo.dart';
+import 'package:todo_riverpod/repository/todo_repository.dart';
 
 enum SortOrder {
   ASC,
   DESC,
 }
 
-final _sortOrder = StateProvider.autoDispose((ref) => SortOrder.ASC);
-final _todos = StateProvider.autoDispose<List<Todo>>((ref) => null);
+final _sortOrderState = StateProvider<SortOrder>((ref) => SortOrder.ASC);
+final _todoListState = StateProvider<List<Todo>?>((ref) => null);
 
-final sortedTodos = StateProvider<List<Todo>>((ProviderReference ref) {
-  final List<Todo> todos = ref.watch(_todos).state;
-  final SortOrder sortOrder = ref.watch(_sortOrder).state;
+final sortedTodoListState = StateProvider<List<Todo>?>((ref) {
+  final List<Todo>? todoList = ref.watch(_todoListState);
 
-  if (sortOrder == SortOrder.ASC) {
-    todos?.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+  if (ref.watch(_sortOrderState) == SortOrder.ASC) {
+    todoList?.sort((a, b) => a.timestamp.compareTo(b.timestamp));
   } else {
-    todos?.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    todoList?.sort((a, b) => b.timestamp.compareTo(a.timestamp));
   }
-  return todos;
+  return todoList;
 });
 
-final todosViewController =
-    Provider.autoDispose((ref) => TodosViewController(ref.read));
+final todoViewController =
+    Provider.autoDispose((ref) => TodoViewController(ref.read));
 
-class TodosViewController {
-  final Reader read;
-  TodosViewController(this.read);
+class TodoViewController {
+  final Reader _read;
+  TodoViewController(this._read);
 
-  void initState() async {
-    read(_todos).state = await read(todoRepository).getTodos();
+  Future<void> initState() async {
+    _read(_todoListState.notifier).state =
+        await _read(todoRepository).getTodoList();
   }
 
   void dispose() {
-    read(_todos).state.clear();
+    _read(_todoListState)?.clear();
   }
 
-  void addTodo(TextEditingController controller) async {
-    final String text = controller.text;
+  Future<void> addTodo(TextEditingController textController) async {
+    final String text = textController.text;
     if (text.trim().isEmpty) {
       return;
     }
-    controller.text = '';
+    textController.text = '';
     final now = DateTime.now();
-    final newTodo = Todo(text, false, now, "${now.millisecondsSinceEpoch}");
-    final todos = read(_todos).state..add(newTodo);
-    await read(todoRepository).saveTodos(todos);
-    read(_todos).state = todos;
+    final newTodo = Todo(
+      content: text,
+      done: false,
+      timestamp: now,
+      id: "${now.millisecondsSinceEpoch}",
+    );
+    final List<Todo> newTodoList = [newTodo, ...(_read(_todoListState) ?? [])];
+    _read(_todoListState.notifier).state = newTodoList;
+    await _read(todoRepository).saveTodoList(newTodoList);
   }
 
-  void toggleStatus(Todo todo) async {
-    final todos = read(_todos).state;
-    final idx = todos.indexWhere((elem) => todo.uid == elem.uid);
-    if (idx < 0) {
-      return;
-    }
-    todos[idx] = todo.copyWith(done: !todo.done);
-    await read(todoRepository).saveTodos(todos);
-    read(_todos).state = todos;
+  Future<void> toggleDoneStatus(Todo todo) async {
+    final List<Todo> newTodoList = [
+      ...(_read(_todoListState) ?? [])
+          .map((e) => (e.id == todo.id) ? e.copyWith(done: !e.done) : e)
+    ];
+    _read(_todoListState.notifier).state = newTodoList;
+    await _read(todoRepository).saveTodoList(newTodoList);
   }
 
-  void changeSortOrder() {
-    final SortOrder sortOrder = read(_sortOrder).state;
-    read(_sortOrder).state =
-        sortOrder == SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
+  void toggleSortOrder() {
+    _read(_sortOrderState.notifier).state =
+        _read(_sortOrderState) == SortOrder.ASC
+            ? SortOrder.DESC
+            : SortOrder.ASC;
   }
 }

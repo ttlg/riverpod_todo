@@ -1,20 +1,20 @@
-import 'package:architect_test/entity/todo.dart';
-import 'package:architect_test/provider/todo_providers.dart';
-import 'package:architect_test/repository/todo_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:todo_riverpod/entity/todo.dart';
+import 'package:todo_riverpod/provider/todo_providers.dart';
+import 'package:todo_riverpod/repository/todo_repository.dart';
 
 class _TodoRepositoryImplDummy implements TodoRepository {
   List<Todo> inMemoryTodoList = [];
 
-  Future<List<Todo>> getTodos() async {
+  Future<List<Todo>> getTodoList() async {
     return inMemoryTodoList;
   }
 
-  Future<void> saveTodos(List<Todo> todos) async {
-    inMemoryTodoList = todos;
+  Future<void> saveTodoList(List<Todo> todoList) async {
+    inMemoryTodoList = todoList;
   }
 }
 
@@ -27,42 +27,42 @@ void main() {
       ],
     );
     test('initial value of todo list is null', () async {
-      expect(container.read(sortedTodos).state, null);
+      expect(container.read(sortedTodoListState), null);
     });
 
     test('initial load is empty array', () async {
-      await container.read(todosViewController).initState();
-      expect(container.read(sortedTodos).state, []);
+      await container.read(todoViewController).initState();
+      expect(container.read(sortedTodoListState), []);
     });
 
     test('add first todo', () async {
       await container
-          .read(todosViewController)
+          .read(todoViewController)
           .addTodo(TextEditingController(text: 'first'));
-      expect(container.read(sortedTodos).state[0].content, 'first');
+      expect(container.read(sortedTodoListState)![0].content, 'first');
     });
 
     test('add second todo', () async {
       await container
-          .read(todosViewController)
+          .read(todoViewController)
           .addTodo(TextEditingController(text: 'second'));
-      expect(container.read(sortedTodos).state[1].content, 'second');
+      expect(container.read(sortedTodoListState)![1].content, 'second');
     });
 
     test('toggle status', () async {
-      final Todo firstTodo = container.read(sortedTodos).state[0];
-      await container.read(todosViewController).toggleStatus(firstTodo);
-      expect(container.read(sortedTodos).state[0].done, true);
+      final Todo firstTodo = container.read(sortedTodoListState)![0];
+      await container.read(todoViewController).toggleDoneStatus(firstTodo);
+      expect(container.read(sortedTodoListState)![0].done, true);
     });
 
     test('change sort order', () async {
-      await container.read(todosViewController).changeSortOrder();
-      expect(container.read(sortedTodos).state[0].content, 'second');
+      container.read(todoViewController).toggleSortOrder();
+      expect(container.read(sortedTodoListState)![0].content, 'second');
     });
 
     test('dispose', () async {
-      await container.read(todosViewController).dispose();
-      expect(container.read(sortedTodos).state, []);
+      container.read(todoViewController).dispose();
+      expect(container.read(sortedTodoListState), []);
     });
   });
 }
