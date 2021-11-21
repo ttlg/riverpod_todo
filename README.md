@@ -4,4 +4,4 @@ This repository has been created to illustrate a pragmatic architecture using Ri
 
 ## Articles
 - [English Version](https://medium.com/@mxiskw/flutter-pragmatic-architecture-using-riverpod-123ae11a8267)
-- [Japanese Version](https://note.com/mxiskw/n/n0b5d61202ffe)
+- [Japanese Version](https://note.com/mxiskw/n/n78a69ca171cb)
